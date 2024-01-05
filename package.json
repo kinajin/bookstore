@@ -1,0 +1,22 @@
+{
+  "name": "bookstore",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kinajin/bookstore.git"
+  },
+  "author": "kina",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kinajin/bookstore/issues"
+  },
+  "homepage": "https://github.com/kinajin/bookstore#readme",
+  "dependencies": {
+    "exrpess": "^0.0.1-security"
+  }
+}
