@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/kinajin/bookstore#readme",
   "dependencies": {
-    "exrpess": "^0.0.1-security"
+    "exrpess": "^0.0.1-security",
+    "mysql": "^2.18.1"
   }
 }
