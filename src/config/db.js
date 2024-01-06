@@ -17,7 +17,7 @@ connection.connect((error) => {
     console.error("데이터베이스 연결 실패:", error);
     return;
   }
-  console.log("데이터베이스에 성공적으로 연결되었습니다.");
+  console.log("👍 데이터베이스에 성공적으로 연결되었습니다.");
 });
 
 module.exports = connection;
