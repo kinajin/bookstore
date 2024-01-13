@@ -16,7 +16,6 @@ module.exports = {
           key: "id",
         },
         onUpdate: "CASCADE",
-        // onDelete: "SET NULL", // 또는 'CASCADE', 필요에 따라 선택
       },
       Name: {
         type: Sequelize.STRING,
@@ -30,10 +29,12 @@ module.exports = {
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
+        defaultValue: Sequelize.fn("now"),
       },
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
+        defaultValue: Sequelize.fn("now"),
       },
     });
   },

@@ -18,6 +18,7 @@ module.exports = {
       },
       BookID: {
         type: Sequelize.INTEGER,
+        primaryKey: true,
         references: { model: "Books", key: "id" },
         onUpdate: "CASCADE",
         onDelete: "CASCADE",
@@ -28,10 +29,12 @@ module.exports = {
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
+        defaultValue: Sequelize.fn("now"),
       },
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
+        defaultValue: Sequelize.fn("now"),
       },
     });
   },
