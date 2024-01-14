@@ -1,65 +1,65 @@
-const db = require("../../config/db");
+// const db = require("../../config/db");
+
+// 데이터베이스 연결
+// 노드는 디렉토리에 존재하는 index.js 파일을 자동으로 찾음, 따라서 뒤에 index 생략가능
+const db = require("../../../models");
 
 exports.searchBooks = (req, res) => {
   // 이부분 어려워서 나중에 짜기
 };
 
-exports.getNewBooks = (req, res) => {
-  db.query(
-    "SELECT * FROM Books WHERE isNewArrival = true",
-    (error, results) => {
-      if (error) {
-        console.error(error);
-        res.status(500).send("서버 오류");
-        return;
-      }
-      if (results.length > 0) {
-        res.json(results);
-      } else {
-        res.status(404).json({ message: "신간이 존재하지 않습니다" });
-      }
-    },
-  );
+exports.getNewBooks = async (req, res) => {
+  try {
+    const newBooks = await db.Books.findAll({
+      where: { IsNewArrival: true },
+    });
+
+    if (newBooks.length > 0) {
+      res.json(newBooks);
+    } else {
+      res.status(404).json({ message: "신간이 존재하지 않습니다" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("서버 오류");
+  }
 };
 
-exports.getBookDetails = (req, res) => {
+exports.getBookDetails = async (req, res) => {
   const { bookID } = req.params;
-  db.query(
-    "SELECT * FROM Books WHERE BookID = ?",
-    [bookID],
-    (error, results) => {
-      if (error) {
-        console.error(error);
-        res.status(500).send("서버 오류");
-        return;
-      }
-      if (results.length > 0) {
-        res.json(results[0]);
-      } else {
-        res.status(404).json({ message: "존재하지 않는 도서입니다" });
-      }
-    },
-  );
+  try {
+    const book = await db.Books.findOne({
+      where: { id: bookID },
+    });
+
+    if (book) {
+      res.json(book);
+    } else {
+      res.status(404).json({ message: "존재하지 않는 도서입니다" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("서버 오류");
+  }
 };
 
-exports.getNewBooksByCategory = (req, res) => {
+exports.getNewBooksByCategory = async (req, res) => {
   const { category } = req.params;
-  db.query(
-    "SELECT * FROM Books WHERE isNewArrival = true AND Category = ?",
-    [category],
-    (error, results) => {
-      if (error) {
-        console.error(error);
-        res.status(500).send("서버 오류");
-        return;
-      }
-      if (results.length > 0) {
-        res.json(results);
-      } else {
-        res
-          .status(404)
-          .json({ message: "해당 카테고리의 신간 도서가 없습니다" });
-      }
-    },
-  );
+  try {
+    const newBooks = await db.Books.findAll({
+      where: {
+        IsNewArrival: true,
+        Category: category,
+      },
+    });
+
+    if (newBooks.length > 0) {
+      res.json(newBooks);
+    } else {
+      res.status(404).json({ message: "해당 카테고리의 신간 도서가 없습니다" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("서버 오류");
+  }
 };

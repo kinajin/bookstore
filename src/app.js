@@ -6,7 +6,7 @@ const express = require("express");
 const app = express();
 
 // 데이터베이스 연결
-const db = require("../src/config/db");
+const db = require("../models/index");
 
 //라우트 설정
 
