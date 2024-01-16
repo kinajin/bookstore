@@ -1,12 +1,7 @@
-// const db = require("../../config/db");
-
 // 데이터베이스 연결
 // 노드는 디렉토리에 존재하는 index.js 파일을 자동으로 찾음, 따라서 뒤에 index 생략가능
+const { off } = require("process");
 const db = require("../../../models");
-
-exports.searchBooks = (req, res) => {
-  // 이부분 어려워서 나중에 짜기
-};
 
 exports.getNewBooks = async (req, res) => {
   try {

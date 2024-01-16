@@ -1,20 +1,22 @@
-const db = require("../../config/db");
+const db = require("../../../models");
 
-exports.viewCart = (req, res) => {
-  const { userEmail } = req.query;
+exports.viewCart = async (req, res) => {
+  const { userID } = req.query;
 
-  // 장바구니 조회 쿼리 실행
-  // 쿼리 예시: "SELECT * FROM Cart WHERE userEmail = ?"
-  db.query(
-    "SELECT * FROM Cart WHERE userEmail = ?",
-    [userEmail],
-    (error, results) => {
-      if (error) {
-        console.error(error);
-        res.status(500).send("서버 오류");
-        return;
-      }
-      res.json(results);
-    },
-  );
+  try {
+    const newCart = await db.Carts.findAll({
+      where: {
+        userID: userID,
+      },
+    });
+
+    if (newCart.length > 0) {
+      res.json(newCart);
+    } else {
+      res.status(404).json({ message: "장바구니가 존재하지 않습니다" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("서버 오류");
+  }
 };

@@ -11,13 +11,15 @@ const db = require("../models/index");
 //라우트 설정
 
 const bookRoutes = require("./api/routes/bookRoutes");
+const searchRoutes = require("./api/routes/searchRoutes");
 // const userRoutes = require("./api/routes/userRoutes");
 const cartRoutes = require("./api/routes/cartRoutes");
 // const orderRoutes = require("./api/routes/orderRoutes");
 
+app.use("/search", searchRoutes);
 app.use("/books", bookRoutes);
 // app.use("/users", userRoutes);
-// app.use("/cart", cartRoutes);
+app.use("/cart", cartRoutes);
 // app.use("/order", orderRoutes);
 
 // 서버 시작
