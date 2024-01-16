@@ -4,6 +4,7 @@
 // express 어플리케이션 초기화
 const express = require("express");
 const app = express();
+app.use(express.json()); // JSON 요청 본문 파싱을 위해 필요
 
 // 데이터베이스 연결
 const db = require("../models/index");
