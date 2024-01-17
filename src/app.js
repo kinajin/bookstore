@@ -15,13 +15,13 @@ const bookRoutes = require("./api/routes/bookRoutes");
 const searchRoutes = require("./api/routes/searchRoutes");
 // const userRoutes = require("./api/routes/userRoutes");
 const cartRoutes = require("./api/routes/cartRoutes");
-// const orderRoutes = require("./api/routes/orderRoutes");
+const orderRoutes = require("./api/routes/orderRoutes");
 
 app.use("/search", searchRoutes);
 app.use("/books", bookRoutes);
 // app.use("/users", userRoutes);
 app.use("/cart", cartRoutes);
-// app.use("/order", orderRoutes);
+app.use("/order", orderRoutes);
 
 // 서버 시작
 const PORT = 3000; // 사용할 포트 번호를 선택하세요.

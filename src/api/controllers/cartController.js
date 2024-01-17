@@ -33,8 +33,6 @@ exports.viewCart = async (req, res) => {
 };
 
 // 장바구니에 추가
-// 연속 두번 요청할 경우 오류가 나는데 수정 필요!!!!!!!!!!!!!
-
 exports.addCartItem = async (req, res) => {
   const { userID, BookID, quantity } = req.body;
 
