@@ -89,19 +89,27 @@ exports.addCartItem = async (req, res) => {
   }
 };
 
-// 장바구니에서 삭제
+// 장바구니에서 상세 아이템 삭제 ()
 exports.deleteCartDetail = async (req, res) => {
+  const { CartID, cartDetailID } = req.body;
+
   try {
-    const { cartDetailID } = req.body;
+    const cartItem = await db.CartDetail.findOne({
+      where: { CartID: CartID, id: cartDetailID },
+    });
 
-    await CartDetail.destroy({ where: { id: cartDetailID } });
+    if (!cartItem) {
+      return res
+        .status(404)
+        .json({ success: false, message: "아이템을 찾을 수 없습니다." });
+    }
 
-    return res
+    await cartItem.destroy();
+    res
       .status(200)
-      .json({ success: true, message: "Cart detail removed" });
+      .json({ success: true, message: "아이템이 삭제되었습니다." });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ success: false, message: "Error removing cart detail" });
+    console.error(error);
+    res.status(500).json({ success: false, message: "서버 오류" });
   }
 };

@@ -11,14 +11,12 @@ module.exports = {
       },
       CartID: {
         type: Sequelize.INTEGER,
-        primaryKey: true,
         references: { model: "Carts", key: "id" },
         onUpdate: "CASCADE",
         onDelete: "CASCADE",
       },
       BookID: {
         type: Sequelize.INTEGER,
-        primaryKey: true,
         references: { model: "Books", key: "id" },
         onUpdate: "CASCADE",
         onDelete: "CASCADE",
