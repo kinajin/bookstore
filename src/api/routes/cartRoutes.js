@@ -8,7 +8,7 @@ router.get("/", cartController.viewCart);
 // 장바구니에 추가
 router.post("/", cartController.addCartItem);
 
-// // 장바구니에서 삭제
-// router.delete("/", cartController.removeFromCart);
+// 장바구니에서 삭제
+router.delete("/", cartController.deleteCartDetail);
 
 module.exports = router;
