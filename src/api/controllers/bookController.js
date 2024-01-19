@@ -1,6 +1,5 @@
 // 데이터베이스 연결
 // 노드는 디렉토리에 존재하는 index.js 파일을 자동으로 찾음, 따라서 뒤에 index 생략가능
-const { off } = require("process");
 const db = require("../../../models");
 
 exports.getNewBooks = async (req, res) => {
@@ -25,6 +24,27 @@ exports.getBookDetails = async (req, res) => {
   try {
     const book = await db.Books.findOne({
       where: { id: bookID },
+      attributes: {
+        include: [
+          [
+            db.sequelize.literal(`(
+              SELECT COUNT(*)
+              FROM Likes
+              WHERE Likes.BookID = Books.id
+            )`),
+            "LikesCount",
+          ],
+
+          [
+            db.sequelize.literal(`(
+              SELECT COUNT(*)
+              FROM BookImages
+              WHERE BookImages.BookID = Books.id
+            )`),
+            "imageURL",
+          ],
+        ],
+      },
     });
 
     if (book) {
