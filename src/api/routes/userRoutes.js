@@ -12,7 +12,7 @@ router.post("/login", userController.login);
 router.post("/password-reset/request", userController.sendResetEmail);
 
 // 비밀번호 재설정 페이지
-// router.get("/password-reset/confirm", userController.resetPasswordPage);
+router.get("/password-reset/confirm", userController.resetPasswordPage);
 
 // 비밀번호 재설정 처리
 router.post("/password-reset/confirm", userController.resetPassword);

@@ -53,7 +53,7 @@ exports.login = async (req, res) => {
   }
 };
 
-// 비밀번호 재설정
+// 비밀번호 재설정 메일 보내기
 exports.sendResetEmail = async (req, res) => {
   const { UserEmail } = req.body;
 
@@ -108,7 +108,7 @@ exports.sendResetEmail = async (req, res) => {
   }
 };
 
-// 비밀번호 재설정 처리
+// 비밀번호 재설정
 exports.resetPassword = async (req, res) => {
   const { token } = req.query;
   const { Password, confirmPassword } = req.body;
@@ -144,6 +144,40 @@ exports.resetPassword = async (req, res) => {
     });
 
     res.send("비밀번호가 재설정되었습니다.");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("서버 오류");
+  }
+};
+
+// 비밀번호 재설정 페이지
+exports.resetPasswordPage = async (req, res) => {
+  const { token } = req.query; // URL에서 토큰을 가져옵니다.
+
+  // 토큰의 유효성 검증 로직을 추가할 수 있습니다.
+  try {
+    // 토큰으로 사용자 찾기
+    const users = await db.Users.findAll({
+      where: {
+        TokenExpiration: {
+          [db.Sequelize.Op.gt]: new Date(), // 토큰 만료 시간이 현재 시간보다 이후인 경우
+        },
+      },
+    });
+
+    const user = users.find((u) => bcrypt.compareSync(token, u.Token));
+
+    if (!user) {
+      return res.status(400).send("잘못된 토큰이거나 만료된 토큰입니다.");
+    }
+
+    res.status(200).send(`<h1>비밀번호 재설정</h1>
+              <p>토큰: ${token}</p>
+              <form action="/users/password-reset/confirm" method="post">
+                <input type="password" name="Password" placeholder="새 비밀번호" required />
+                <input type="password" name="confirmPassword" placeholder="비밀번호 확인" required />
+                <button type="submit">비밀번호 재설정</button>
+              </form>`);
   } catch (error) {
     console.error(error);
     res.status(500).send("서버 오류");
