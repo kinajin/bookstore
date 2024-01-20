@@ -23,23 +23,14 @@ exports.viewOrder = async (req, res) => {
 };
 
 // 주문 추가
-exports.createOrder = async (req, res) => {
-  const { userID, Name, Address, PhoneNumber, selectedCartDetailIDs } =
-    req.body;
+exports.submitOrder = async (req, res) => {
+  const { userID, Name, Address, PhoneNumber } = req.body;
 
   // 입력 데이터 검증
   if (!Name || !Address || !PhoneNumber) {
     return res.status(400).json({
       success: false,
       message: "모든 필수 항목을 입력해주세요.",
-    });
-  }
-
-  // 입력 데이터 검증
-  if (!selectedCartDetailIDs || selectedCartDetailIDs.length === 0) {
-    return res.status(400).json({
-      success: false,
-      message: "장바구니 항목이 선택해주세요",
     });
   }
 
@@ -52,42 +43,16 @@ exports.createOrder = async (req, res) => {
         .json({ success: false, message: "사용자를 찾을 수 없습니다." });
     }
 
-    // 장바구니 있는지 확인하기
-    let cart = await db.Carts.findOne({ where: { userID: user.id } });
-    if (!cart) {
-      return res.status(404).json({
-        success: false,
-        message: "주문에 넣을 장바구니를 찾을 수 없습니다.",
-      });
-    }
-
-    // 새로운 오더 생성
-    const createdOrder = await db.Orders.create({
-      UserID: userID,
-      Name: Name,
-      Address: Address,
-      PhoneNumber: PhoneNumber,
-    });
-
     // 선택된 카트 디테일들 찾기 (배열도 가능 )
-    const selectedCartDetails = await db.CartDetail.findAll({
-      where: { CartID: cart.id, id: selectedCartDetailIDs },
+    const OrderDetails = await db.OrderDetails.findAll({
+      where: { OrderId: order.id },
     });
 
-    // 선택된 장바구니 항목이 없을 경우 (수정된 부분) id IN [selectedCartDetailIDs의 요소들]
-    if (selectedCartDetails.length == 0) {
+    // 선택된 장바구니 항목이 없을 경우 id IN [selectedCartDetailIDs의 요소들]
+    if (OrderDetails.length == 0) {
       return res.status(404).json({
         success: false,
-        message: "선택된 장바구니 항목이 없습니다.",
-      });
-    }
-
-    // 새로운 오더 디테일 생성 (수정된 부분)
-    for (let cartDetail of selectedCartDetails) {
-      await db.OrderDetails.create({
-        OrderID: createdOrder.id,
-        BookID: cartDetail.BookID,
-        Quantity: cartDetail.Quantity,
+        message: "결제할 항목이 없습니다.",
       });
     }
 
