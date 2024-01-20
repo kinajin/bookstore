@@ -13,6 +13,7 @@ exports.viewCart = async (req, res) => {
       include: [
         {
           model: db.CartDetail,
+          attributes: ["id"], // 여기에 'id' 추가
           include: [
             {
               model: db.Books,
