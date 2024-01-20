@@ -3,7 +3,6 @@ const db = require("../../../models");
 // 주문 조회
 exports.viewOrder = async (req, res) => {
   const { userID } = req.query;
-  console.log("123123");
 
   try {
     const orders = await db.Orders.findAll({

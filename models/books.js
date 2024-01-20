@@ -13,6 +13,14 @@ module.exports = (sequelize, DataTypes) => {
       Books.hasMany(models.Likes, { foreignKey: "BookID" });
       Books.hasMany(models.OrderDetails, { foreignKey: "BookID" });
       Books.hasMany(models.Reviews, { foreignKey: "BookID" });
+      Books.hasOne(models.BookImages, {
+        foreignKey: "id",
+        sourceKey: "PrimaryImageID",
+      });
+      Books.belongsTo(models.BookImages, {
+        foreignKey: "PrimaryImageID",
+        targetKey: "id",
+      });
     }
   }
   Books.init(

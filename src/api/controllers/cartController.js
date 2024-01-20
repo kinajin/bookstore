@@ -1,4 +1,5 @@
 const db = require("../../../models");
+const { Sequelize } = require("sequelize"); // Sequelize 클래스를 가져옴
 
 // 장바구니 조회
 exports.viewCart = async (req, res) => {
@@ -15,6 +16,16 @@ exports.viewCart = async (req, res) => {
           include: [
             {
               model: db.Books,
+              attributes: ["Title", "Summary", "Price", "PrimaryImageID"],
+              include: [
+                {
+                  model: db.BookImages,
+                  attributes: ["ImageURL"],
+                  where: Sequelize.literal(
+                    "`CartDetails->Book`.`PrimaryImageID` = `CartDetails->Book->BookImages`.`id`",
+                  ),
+                },
+              ],
             },
           ],
         },
