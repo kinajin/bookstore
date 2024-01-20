@@ -24,13 +24,22 @@ exports.viewOrder = async (req, res) => {
 
 // 주문 추가
 exports.createOrder = async (req, res) => {
-  const { userID, Name, Address, PhoneNumber } = req.body;
+  const { userID, Name, Address, PhoneNumber, selectedCartDetailIDs } =
+    req.body;
 
-  // 입력 데이터 검증 (추가적인 검증 로직 필요)
+  // 입력 데이터 검증
   if (!Name || !Address || !PhoneNumber) {
     return res.status(400).json({
       success: false,
       message: "모든 필수 항목을 입력해주세요.",
+    });
+  }
+
+  // 입력 데이터 검증
+  if (!selectedCartDetailIDs || selectedCartDetailIDs.length === 0) {
+    return res.status(400).json({
+      success: false,
+      message: "장바구니 항목이 선택해주세요",
     });
   }
 
@@ -60,22 +69,22 @@ exports.createOrder = async (req, res) => {
       PhoneNumber: PhoneNumber,
     });
 
-    // 주문에 넣을 카트 디테일들 다 찾기
-    const cartDetails = await db.CartDetail.findAll({
-      where: { cartID: cart.id },
+    // 선택된 카트 디테일들 찾기 (배열도 가능 )
+    const selectedCartDetails = await db.CartDetail.findAll({
+      where: { CartID: cart.id, id: selectedCartDetailIDs },
     });
 
-    // 장바구니 안에 cartdetail이 없을 경우
-    if (cartDetails.length == 0) {
+    // 선택된 장바구니 항목이 없을 경우 (수정된 부분) id IN [selectedCartDetailIDs의 요소들]
+    if (selectedCartDetails.length == 0) {
       return res.status(404).json({
         success: false,
-        message: "장바구니에 아무것도 없습니다.",
+        message: "선택된 장바구니 항목이 없습니다.",
       });
     }
 
-    //새로운 오더 디테일 생성
-    for (let cartDetail of cartDetails) {
-      const newOrderDetail = await db.OrderDetails.create({
+    // 새로운 오더 디테일 생성 (수정된 부분)
+    for (let cartDetail of selectedCartDetails) {
+      await db.OrderDetails.create({
         OrderID: createdOrder.id,
         BookID: cartDetail.BookID,
         Quantity: cartDetail.Quantity,
