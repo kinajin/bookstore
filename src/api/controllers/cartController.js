@@ -91,7 +91,7 @@ exports.createOrder = async (req, res) => {
     }
 
     // 새로운 오더 생성
-    const createdOrder = await db.Orders.create({
+    const newOrder = await db.Orders.create({
       UserID: userID,
     });
 
@@ -111,7 +111,7 @@ exports.createOrder = async (req, res) => {
     // 새로운 오더 디테일 생성 (수정된 부분)
     for (let cartDetail of selectedCartDetails) {
       await db.OrderDetails.create({
-        OrderID: createdOrder.id,
+        OrderID: newOrder.id,
         BookID: cartDetail.BookID,
         Quantity: cartDetail.Quantity,
       });
@@ -123,6 +123,7 @@ exports.createOrder = async (req, res) => {
     return res.status(201).json({
       success: true,
       message: "주문이 성공적으로 생성되었습니다.",
+      newOrder,
     });
   } catch (error) {
     console.error(error);

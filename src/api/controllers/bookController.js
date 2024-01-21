@@ -30,29 +30,59 @@ exports.getBookDetails = async (req, res) => {
         include: [
           [
             db.sequelize.literal(`(
-              SELECT COUNT(*)
-              FROM Likes
-              WHERE Likes.BookID = Books.id
-            )`),
+                SELECT COUNT(*)
+                FROM Likes
+                WHERE Likes.BookID = Books.id
+              )`),
             "LikesCount",
-          ],
-
-          [
-            db.sequelize.literal(`(
-              SELECT COUNT(*)
-              FROM BookImages
-              WHERE BookImages.BookID = Books.id
-            )`),
-            "imageURL",
           ],
         ],
       },
+      include: [
+        {
+          model: db.BookImages,
+          attributes: ["ImageURL"], // 도서의 이미지 URL들을 배열로 가져오기
+        },
+      ],
+
+      include: [
+        {
+          model: db.Reviews,
+
+          include: [
+            {
+              model: db.Users,
+              attributes: ["UserEmail"], // 도서의 이미지 URL들을 배열로 가져오기
+            },
+          ],
+        },
+      ],
+    });
+
+    // 같은 카테고리의 베스트 도서 조회 (수정된 부분)
+    const categoryBestBooks = await db.Books.findAll({
+      where: {
+        Category: book.Category,
+        id: { [db.Sequelize.Op.ne]: BookID }, //not equal
+      },
+      limit: 5,
+      order: [
+        [
+          db.sequelize.literal(`(
+      SELECT COUNT(*)
+      FROM Likes
+      WHERE Likes.BookID = Books.id
+    )`),
+          "DESC",
+        ],
+      ],
+      attributes: ["id", "Title", "Price", "Summary"], // 필요한 도서 정보
     });
 
     if (book) {
-      res.json(book);
+      res.status(200).json({ book, categoryBestBooks }); // 수정된 부분
     } else {
-      res.status(404).json({ message: "존재하지 않는 도서입니다" });
+      res.status(404).json({ message: "존재하지 않는 도서입니다" }); // 수정된 부분
     }
   } catch (error) {
     console.error(error);

@@ -6,9 +6,19 @@ exports.viewOrder = async (req, res) => {
 
   try {
     const orders = await db.Orders.findAll({
-      where: {
-        UserID: userID,
-      },
+      where: { UserID: userID },
+      include: [
+        {
+          model: db.OrderDetails,
+          //   attributes: ["BookID"],
+          include: [
+            {
+              model: db.Books,
+              //   attributes: ["Title", "Price"],
+            },
+          ],
+        },
+      ],
     });
 
     if (orders.length > 0) {
@@ -24,7 +34,7 @@ exports.viewOrder = async (req, res) => {
 
 // 주문 추가
 exports.submitOrder = async (req, res) => {
-  const { userID, Name, Address, PhoneNumber } = req.body;
+  const { orderID, userID, Name, Address, PhoneNumber } = req.body;
 
   // 입력 데이터 검증
   if (!Name || !Address || !PhoneNumber) {
@@ -34,8 +44,8 @@ exports.submitOrder = async (req, res) => {
     });
   }
 
-  // 사용자 있는지 확인하기
   try {
+    // 사용자 있는지 확인하기
     const user = await db.Users.findOne({ where: { id: userID } });
     if (!user) {
       return res
@@ -43,9 +53,29 @@ exports.submitOrder = async (req, res) => {
         .json({ success: false, message: "사용자를 찾을 수 없습니다." });
     }
 
-    // 선택된 카트 디테일들 찾기 (배열도 가능 )
+    // 주문 있는지 확인하기
+    const order = await db.Orders.findOne({ where: { id: orderID } });
+    if (!order) {
+      return res
+        .status(404)
+        .json({ success: false, message: "해당 주문을 찾을 수 없습니다." });
+    }
+
+    // 주문 정보 업데이트
+    order.Name = Name;
+    order.Address = Address;
+    order.PhoneNumber = PhoneNumber;
+    await order.save();
+
+    // 선택된 오더 디테일들 찾기 (배열도 가능 )
     const OrderDetails = await db.OrderDetails.findAll({
-      where: { OrderId: order.id },
+      where: { OrderId: orderID },
+      include: [
+        {
+          model: db.Books,
+          attributes: ["Title", "Summary", "Price"], // 책 제목, 요약, 가격 추가
+        },
+      ],
     });
 
     // 선택된 장바구니 항목이 없을 경우 id IN [selectedCartDetailIDs의 요소들]
@@ -59,6 +89,8 @@ exports.submitOrder = async (req, res) => {
     return res.status(201).json({
       success: true,
       message: "주문이 성공적으로 생성되었습니다.",
+      OrderDetails,
+      order,
     });
   } catch (error) {
     console.error(error);
