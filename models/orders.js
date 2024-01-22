@@ -20,6 +20,15 @@ module.exports = (sequelize, DataTypes) => {
       Name: DataTypes.STRING,
       Address: DataTypes.TEXT,
       PhoneNumber: DataTypes.STRING,
+
+      PaymentStatus: {
+        type: DataTypes.STRING,
+        defaultValue: "결제전", // default value
+      },
+      DeliveryStatus: {
+        type: DataTypes.STRING,
+        defaultValue: "배송 전", // default value
+      },
     },
     {
       sequelize,

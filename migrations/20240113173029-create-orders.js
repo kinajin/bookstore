@@ -26,6 +26,16 @@ module.exports = {
       PhoneNumber: {
         type: Sequelize.STRING,
       },
+
+      PaymentStatus: {
+        type: Sequelize.STRING,
+        defaultValue: "결제전", // default value
+      },
+      DeliveryStatus: {
+        type: Sequelize.STRING,
+        defaultValue: "배송 전", // default value
+      },
+
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
