@@ -1,3 +1,6 @@
+require("dotenv").config(); // dotenv 라이브러리를 사용하여 .env 파일을 로드
+
+const jwt = require("jsonwebtoken");
 const db = require("../../../models");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto"); // Node.js 내장 모듈
@@ -18,7 +21,13 @@ exports.signUp = async (req, res) => {
       UserEmail,
       Password: hashedPassword,
     });
-    res.status(201).json(newUser);
+
+    // 회원가입 후 JWT 생성
+    const token = jwt.sign({ userId: newUser.id }, process.env.JWT_SECRET, {
+      expiresIn: "24h",
+    });
+
+    res.status(201).json({ newUser, token });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "서버 오류" });
@@ -45,8 +54,13 @@ exports.login = async (req, res) => {
       return res.status(401).send("비밀번호가 일치하지 않습니다.");
     }
 
+    // 로그인 성공 시 JWT 생성, 이건 acceses 토큰임
+    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
+      expiresIn: "24h",
+    });
+
     // 로그인 성공 처리
-    res.status(200).json({ message: "로그인 성공", user });
+    res.status(200).json({ message: "로그인 성공", user, token });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "서버 오류" });
@@ -68,12 +82,6 @@ exports.sendResetEmail = async (req, res) => {
     const resetToken = crypto.randomBytes(20).toString("hex");
     const resetTokenHash = await bcrypt.hash(resetToken, 10);
 
-    console.log("222222");
-    console.log(resetToken);
-    console.log("2222222");
-    console.log(resetTokenHash);
-    console.log("222222");
-
     // 데이터베이스에 토큰 저장
     // TokenExpiration을 현재 시간으로부터 24시간 후로 설정
     await user.update({
@@ -87,8 +95,8 @@ exports.sendResetEmail = async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: "bookstoretest77@gmail.com",
-        pass: "jpcx aeji nfwe fppm",
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
       },
     });
 

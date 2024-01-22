@@ -1,6 +1,7 @@
 // 데이터베이스 연결
 // 노드는 디렉토리에 존재하는 index.js 파일을 자동으로 찾음, 따라서 뒤에 index 생략가능
 const db = require("../../../models");
+const jwt = require("jsonwebtoken");
 
 // 신간 조회 (완료)
 exports.getNewBooks = async (req, res) => {
@@ -114,10 +115,35 @@ exports.getNewBooksByCategory = async (req, res) => {
 
 // 장바구니에 추가
 exports.addCartItem = async (req, res) => {
+  // JWT 토큰을 헤더에서 가져옴
+  //   const token = req.headers.authorization;
+
   const { BookID } = req.params;
   const { userID, quantity } = req.body;
 
+  //   if (!token) {
+  //     // 변경: 로그인하지 않은 사용자에게 메시지 전송
+  //     return res.status(401).json({
+  //       success: false,
+  //       message: "로그인이 필요합니다.",
+  //     });
+  //   }
+
   try {
+    // JWT 토큰 검증
+    // const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // const { userId: userIdFromToken } = decoded; // JWT 토큰에서 userID 추출
+
+    // if (userIdFromToken !== userID) {
+    //   console.log(userIdFromToken);
+    //   console.log(userID);
+    //   console.log(decoded);
+    //   return res.status(404).json({
+    //     success: false,
+    //     message: "사용자 정보와 토큰 정보가 일치하지 않습니다.",
+    //   });
+    // }
+
     const user = await db.Users.findOne({ where: { id: userID } });
     if (!user) {
       return res
@@ -158,11 +184,14 @@ exports.addCartItem = async (req, res) => {
         message: "장바구니에 항목이 추가되었습니다.",
       });
     }
-
-    res
-      .status(201)
-      .json({ success: true, message: "장바구니에 항목이 추가되었습니다." });
   } catch (error) {
+    if (error.name === "JsonWebTokenError") {
+      // 변경: 유효하지 않은 토큰에 대한 처리
+      return res.status(401).json({
+        success: false,
+        message: "유효하지 않은 토큰입니다.",
+      });
+    }
     console.error(error);
     res.status(500).json({ success: false, message: "서버 오류" });
   }

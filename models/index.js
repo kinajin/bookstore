@@ -1,25 +1,24 @@
 "use strict";
 
+require("dotenv").config();
+
 const fs = require("fs");
 const path = require("path");
 const Sequelize = require("sequelize");
-const process = require("process");
 const basename = path.basename(__filename);
-const env = process.env.NODE_ENV || "development";
-const config = require(__dirname + "/../config/config.json")[env];
 const db = {};
 
-let sequelize;
-if (config.use_env_variable) {
-  sequelize = new Sequelize(process.env[config.use_env_variable], config);
-} else {
-  sequelize = new Sequelize(
-    config.database,
-    config.username,
-    config.password,
-    config,
-  );
-}
+// Sequelize 인스턴스 생성
+const sequelize = new Sequelize(
+  process.env.DB_DATABASE_DEV,
+  process.env.DB_USERNAME_DEV,
+  process.env.DB_PASSWORD_DEV,
+  {
+    host: process.env.DB_HOST,
+    dialect: process.env.DB_DIALECT_DEV, // 방언을 직접 지정 (여기서는 MariaDB를 사용)
+    port: process.env.DB_PORT || 3306, // 포트 번호도 필요에 따라 환경 변수에서 가져올 수 있습니다
+  },
+);
 
 fs.readdirSync(__dirname)
   .filter((file) => {

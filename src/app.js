@@ -1,3 +1,5 @@
+// require("dotenv").config();
+
 // 미들웨어 설정
 // 에러 핸들링
 

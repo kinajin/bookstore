@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const bookController = require("../controllers/bookController");
+const jwtMiddleware = require("../controllers/jwtMiddleware");
 
 // 신간 조회 (완료)
 router.get("/new", bookController.getNewBooks);
@@ -12,6 +13,6 @@ router.get("/:BookID", bookController.getBookDetails);
 router.get("/new/:category", bookController.getNewBooksByCategory);
 
 // 장바구니에 추가
-router.post("/:BookID", bookController.addCartItem);
+router.post("/:BookID", jwtMiddleware, bookController.addCartItem);
 
 module.exports = router;
